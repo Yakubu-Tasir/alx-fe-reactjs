@@ -1,50 +1,101 @@
 import { useState } from "react";
-import { fetchUserData } from "../services/githubService";
+import { fetchAdvancedUsers } from "../services/githubService";
 
-export default function Search() {
+const Search = () => {
   const [username, setUsername] = useState("");
-  const [user, setUser] = useState(null);
+  const [location, setLocation] = useState("");
+  const [minRepos, setMinRepos] = useState("");
+  
+  const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSubmit = async (e) => {
+  const handleSearch = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError("");
-    setUser(null);
+    setResults([]);
 
     try {
-      const data = await fetchUserData(username);
-      setUser(data);
+      const users = await fetchAdvancedUsers({ username, location, minRepos });
+
+      if (users.length === 0) {
+        setError("Looks like we can't find any users.");
+      } else {
+        setResults(users);
+      }
     } catch (err) {
-      setError("Looks like we cant find the user");
+      setError("Looks like we can't find the user.");
     }
 
     setLoading(false);
   };
 
   return (
-    <div>
-      <form onSubmit={handleSubmit}>
-        <input 
-          type="text" 
-          placeholder="Search GitHub username…" 
+    <div className="p-4 max-w-xl mx-auto">
+      <h2 className="text-xl font-bold mb-3">GitHub Advanced User Search</h2>
+
+      {/* Search Form */}
+      <form onSubmit={handleSearch} className="space-y-3">
+        <input
+          type="text"
+          placeholder="Username"
+          className="w-full p-2 border rounded"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
         />
-        <button>Search</button>
+
+        <input
+          type="text"
+          placeholder="Location (optional)"
+          className="w-full p-2 border rounded"
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
+        />
+
+        <input
+          type="number"
+          placeholder="Minimum Repos (optional)"
+          className="w-full p-2 border rounded"
+          value={minRepos}
+          onChange={(e) => setMinRepos(e.target.value)}
+        />
+
+        <button className="w-full bg-blue-500 text-white p-2 rounded">
+          Search
+        </button>
       </form>
 
-      {loading && <p>Loading...</p>}
-      {error && <p>{error}</p>}
+      {/* Loading */}
+      {loading && <p className="mt-4">Loading...</p>}
 
-      {user && (
-        <div>
-          <img src={user.avatar_url} width="100" />
-          <h3>{user.name || user.login}</h3>
-          <a href={user.html_url} target="_blank">View Profile</a>
-        </div>
-      )}
+      {/* Error */}
+      {error && <p className="mt-4 text-red-500">{error}</p>}
+
+      {/* Results */}
+      <div className="mt-4 space-y-4">
+        {results.map((user) => (
+          <div key={user.id} className="p-3 border rounded flex items-center space-x-3">
+            <img
+              src={user.avatar_url}
+              alt={user.login}
+              className="w-12 h-12 rounded-full"
+            />
+            <div>
+              <h3 className="font-semibold">{user.login}</h3>
+              <a
+                href={user.html_url}
+                target="_blank"
+                className="text-blue-600 underline"
+              >
+                View Profile
+              </a>
+            </div>
+          </div>
+        ))}
+      </div>
     </div>
   );
-}
+};
+
+export default Search;
