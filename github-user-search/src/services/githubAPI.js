@@ -2,10 +2,10 @@ import axios from 'axios';
 
 const BASE_URL = 'https://api.github.com';
 
-export const searchGithubUsers = async (query) => {
+export const fetchUserData = async (username) => { 
   try {
     const response = await axios.get(`${BASE_URL}/search/users`, {
-      params: { q: query },
+      params: { q: username },
       headers: {
         Authorization: `Bearer ${import.meta.env.VITE_APP_GITHUB_API_KEY || ''}`,
       },
