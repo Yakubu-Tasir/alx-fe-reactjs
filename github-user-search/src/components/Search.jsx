@@ -5,88 +5,71 @@ const Search = () => {
   const [username, setUsername] = useState("");
   const [location, setLocation] = useState("");
   const [minRepos, setMinRepos] = useState("");
-  
-  const [results, setResults] = useState([]);
+  const [users, setUsers] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
+  const [error, setError] = useState(null);
 
   const handleSearch = async (e) => {
     e.preventDefault();
     setLoading(true);
-    setError("");
-    setResults([]);
+    setError(null);
+    setUsers([]);
 
     try {
-      const users = await fetchAdvancedUsers({ username, location, minRepos });
-
-      if (users.length === 0) {
-        setError("Looks like we can't find any users.");
-      } else {
-        setResults(users);
-      }
-    } catch (err) {
-      setError("Looks like we can't find the user.");
+      const results = await fetchAdvancedUsers({ username, location, minRepos });
+      if (results.length === 0) setError("Looks like we can't find the user");
+      setUsers(results);
+    } catch {
+      setError("Looks like we can't find the user");
+    } finally {
+      setLoading(false);
     }
-
-    setLoading(false);
   };
 
   return (
     <div className="p-4 max-w-xl mx-auto">
-      <h2 className="text-xl font-bold mb-3">GitHub Advanced User Search</h2>
-
-      {/* Search Form */}
-      <form onSubmit={handleSearch} className="space-y-3">
+      <form onSubmit={handleSearch} className="mb-4 flex flex-col gap-2">
         <input
           type="text"
           placeholder="Username"
-          className="w-full p-2 border rounded"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
+          className="border rounded p-2"
         />
-
         <input
           type="text"
-          placeholder="Location (optional)"
-          className="w-full p-2 border rounded"
+          placeholder="Location"
           value={location}
           onChange={(e) => setLocation(e.target.value)}
+          className="border rounded p-2"
         />
-
         <input
           type="number"
-          placeholder="Minimum Repos (optional)"
-          className="w-full p-2 border rounded"
+          placeholder="Minimum Repositories"
           value={minRepos}
           onChange={(e) => setMinRepos(e.target.value)}
+          className="border rounded p-2"
         />
-
-        <button className="w-full bg-blue-500 text-white p-2 rounded">
+        <button type="submit" className="bg-blue-500 text-white rounded p-2 hover:bg-blue-600">
           Search
         </button>
       </form>
 
-      {/* Loading */}
-      {loading && <p className="mt-4">Loading...</p>}
+      {loading && <p>Loading...</p>}
+      {error && <p className="text-red-500">{error}</p>}
 
-      {/* Error */}
-      {error && <p className="mt-4 text-red-500">{error}</p>}
-
-      {/* Results */}
-      <div className="mt-4 space-y-4">
-        {results.map((user) => (
-          <div key={user.id} className="p-3 border rounded flex items-center space-x-3">
-            <img
-              src={user.avatar_url}
-              alt={user.login}
-              className="w-12 h-12 rounded-full"
-            />
+      <div className="grid grid-cols-1 gap-4">
+        {users.map((user) => (
+          <div key={user.id} className="flex items-center gap-4 border p-2 rounded">
+            <img src={user.avatar_url} alt={user.login} className="w-16 h-16 rounded-full" />
             <div>
-              <h3 className="font-semibold">{user.login}</h3>
+              <p className="font-bold">{user.login}</p>
+              {user.location && <p>Location: {user.location}</p>}
               <a
                 href={user.html_url}
                 target="_blank"
-                className="text-blue-600 underline"
+                rel="noopener noreferrer"
+                className="text-blue-500 hover:underline"
               >
                 View Profile
               </a>

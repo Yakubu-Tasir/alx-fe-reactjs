@@ -1,33 +1,29 @@
-import axios from 'axios';
+import axios from "axios";
 
-const GITHUB_SEARCH_URL = 'https://api.github.com/search/users';
+const BASE_URL = "https://api.github.com";
 
-export const fetchUserData = async ({ username, location, minRepos, page = 1 }) => {
-  const apiKey = import.meta.env.VITE_APP_GITHUB_API_KEY;
-
-  let query = '';
-  
-  if (username) query += username;
-  
-  if (location) query += `+location:${location}`;
-  
-  if (minRepos) query += `+repos:>${minRepos}`;
-  
-  if (!query) {
-      
-      query = 'a'; 
-  }
-
+// Basic user fetch
+export const fetchUserData = async (username) => {
   try {
-    const response = await axios.get(`${GITHUB_SEARCH_URL}?q=${query}&page=${page}`, {
-      headers: {
-        Authorization: `token ${apiKey}`,
-      },
-    });
-
+    const response = await axios.get(`${BASE_URL}/users/${username}`);
     return response.data;
   } catch (error) {
-    console.error('GitHub API Error:', error);
+    throw error;
+  }
+};
+
+// Advanced search fetch
+export const fetchAdvancedUsers = async ({ username, location, minRepos }) => {
+  try {
+    let query = "";
+
+    if (username) query += username;
+    if (location) query += `+location:${location}`;
+    if (minRepos) query += `+repos:>${minRepos}`;
+
+    const response = await axios.get(`${BASE_URL}/search/users?q=${query}`);
+    return response.data.items; // GitHub API returns an object with items array
+  } catch (error) {
     throw error;
   }
 };
