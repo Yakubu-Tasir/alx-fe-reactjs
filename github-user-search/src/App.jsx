@@ -21,6 +21,7 @@ function App() {
       <h1>Vite + React</h1>
         <div style={{ padding: "20px" }}>
          <h1>GitHub User Search</h1>
+         
          <Search />
           <p>Project initialized successfully.</p>
     </div>
