@@ -1,29 +1,33 @@
-export const searchGithubUsers = async (
-  username,
-  location = "",
-  minRepos = "",
-  page = 1,
-  per_page = 30
-) => {
-  // Build advanced query
-  let query = username ? `${username}` : "";
+import axios from 'axios';
 
-  if (location) {
-    query += `+location:${location}`;
+const GITHUB_SEARCH_URL = 'https://api.github.com/search/users';
+
+export const fetchUserData = async ({ username, location, minRepos, page = 1 }) => {
+  const apiKey = import.meta.env.VITE_APP_GITHUB_API_KEY;
+
+  let query = '';
+  
+  if (username) query += username;
+  
+  if (location) query += `+location:${location}`;
+  
+  if (minRepos) query += `+repos:>${minRepos}`;
+  
+  if (!query) {
+      
+      query = 'a'; 
   }
 
-  if (minRepos) {
-    query += `+repos:>=${minRepos}`;
+  try {
+    const response = await axios.get(`${GITHUB_SEARCH_URL}?q=${query}&page=${page}`, {
+      headers: {
+        Authorization: `token ${apiKey}`,
+      },
+    });
+
+    return response.data;
+  } catch (error) {
+    console.error('GitHub API Error:', error);
+    throw error;
   }
-
-  // REQUIRED by checker: must contain this exact string
-  const url = `https://api.github.com/search/users?q=${query}&page=${page}&per_page=${per_page}`;
-
-  const response = await fetch(url);
-
-  if (!response.ok) {
-    throw new Error("GitHub API request failed");
-  }
-
-  return await response.json();
 };
