@@ -4,7 +4,6 @@ import viteLogo from '/vite.svg'
 import './App.css'
 import Search from "./components/Search";
 import "./index.css"
-import githubService from "service/githubService"
 
 function App() {
   const [count, setCount] = useState(0)
@@ -23,7 +22,6 @@ function App() {
         <div style={{ padding: "20px" }}>
          <h1>GitHub User Search</h1>
          <Search />
-         <githubService />
           <p>Project initialized successfully.</p>
     </div>
       <div className="card">
