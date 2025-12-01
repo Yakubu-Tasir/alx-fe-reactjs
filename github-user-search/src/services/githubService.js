@@ -1,29 +1,12 @@
-import axios from "axios";
+export const searchGithubUsers = async (query, page = 1, per_page = 30) => {
+  const url = `https://api.github.com/search/users?q=${query}&page=${page}&per_page=${per_page}`;
 
-const BASE_URL = "https://api.github.com";
+  const response = await fetch(url);
 
-// Basic user fetch
-export const fetchUserData = async (username) => {
-  try {
-    const response = await axios.get(`${BASE_URL}/users/${username}`);
-    return response.data;
-  } catch (error) {
-    throw error;
+  if (!response.ok) {
+    throw new Error("Failed to fetch users");
   }
-};
 
-// Advanced search fetch
-export const fetchAdvancedUsers = async ({ username, location, minRepos }) => {
-  try {
-    let query = "";
-
-    if (username) query += username;
-    if (location) query += `+location:${location}`;
-    if (minRepos) query += `+repos:>${minRepos}`;
-
-    const response = await axios.get(`${BASE_URL}/search/users?q=${query}`);
-    return response.data.items; // GitHub API returns an object with items array
-  } catch (error) {
-    throw error;
-  }
+  const data = await response.json();
+  return data; 
 };
