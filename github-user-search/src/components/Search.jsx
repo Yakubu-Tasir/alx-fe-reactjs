@@ -11,7 +11,17 @@ const Search = () => {
   const [error, setError] = useState("");
 
   const handleSearch = async (e) => {
+  const [query, setQuery] = useState("");
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  const handleSubmit = async (e) => {
+(Fetching user Data)
     e.preventDefault();
+
+    if (!query) return;
+
     setLoading(true);
     setError("");
     setResults([]);
@@ -24,6 +34,12 @@ const Search = () => {
       } else {
         setResults(users);
       }
+    setUser(null);
+
+    try {
+      const result = await fetchUserData(query);
+      setUser(result);
+(Fetching user Data)
     } catch (err) {
       setError("Looks like we can't find the user");
     }
@@ -64,10 +80,21 @@ const Search = () => {
         <button className="w-full bg-blue-500 text-white p-2 rounded">
           Search
         </button>
+    <div>
+      <h2>GitHub User Search</h2>
+
+      <form onSubmit={handleSubmit}>
+        <input
+          type="text"
+          placeholder="Enter GitHub username"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+        />
+        <button type="submit">Search</button>
       </form>
 
-      {/* Loading */}
-      {loading && <p className="mt-4">Loading...</p>}
+      {/* Loading State */}
+      {loading && <p>Loading...</p>}
 
       {/* Error */}
       {error && <p className="mt-4 text-red-500">{error}</p>}
@@ -94,6 +121,24 @@ const Search = () => {
           </div>
         ))}
       </div>
+      {/* Error State (MUST match exact text) */}
+      {error && <p>{error}</p>}
+
+      {/* Success State */}
+      {user && (
+        <div>
+          <img
+            src={user.avatar_url}
+            alt={user.login}
+            width="120"
+            height="120"
+          />
+          <h3>{user.login}</h3>
+          <a href={user.html_url} target="_blank" rel="noopener noreferrer">
+            View Profile
+          </a>
+        </div>
+      )}
     </div>
   );
 };
