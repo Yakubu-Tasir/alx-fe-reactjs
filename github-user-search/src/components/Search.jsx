@@ -1,11 +1,11 @@
 import { useState } from "react";
-import { fetchAdvancedUsers } from "../services/githubService";
+import { fetchUserData } from "../services/githubService";
 
 const Search = () => {
   const [username, setUsername] = useState("");
   const [location, setLocation] = useState("");
   const [minRepos, setMinRepos] = useState("");
-  
+
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -17,15 +17,16 @@ const Search = () => {
     setResults([]);
 
     try {
-      const users = await fetchAdvancedUsers({ username, location, minRepos });
+      const data = await fetchUserData({ username, location, minRepos });
+      const users = data.items || [];
 
       if (users.length === 0) {
-        setError("Looks like we can't find any users.");
+        setError("Looks like we cant find the user");
       } else {
         setResults(users);
       }
     } catch (err) {
-      setError("Looks like we can't find the user.");
+      setError("Looks like we cant find the user");
     }
 
     setLoading(false);
@@ -33,9 +34,8 @@ const Search = () => {
 
   return (
     <div className="p-4 max-w-xl mx-auto">
-      <h2 className="text-xl font-bold mb-3">GitHub Advanced User Search</h2>
+      <h2 className="text-xl font-bold mb-3">GitHub User Search</h2>
 
-      {/* Search Form */}
       <form onSubmit={handleSearch} className="space-y-3">
         <input
           type="text"
@@ -66,13 +66,9 @@ const Search = () => {
         </button>
       </form>
 
-      {/* Loading */}
       {loading && <p className="mt-4">Loading...</p>}
-
-      {/* Error */}
       {error && <p className="mt-4 text-red-500">{error}</p>}
 
-      {/* Results */}
       <div className="mt-4 space-y-4">
         {results.map((user) => (
           <div key={user.id} className="p-3 border rounded flex items-center space-x-3">
@@ -86,71 +82,17 @@ const Search = () => {
               <a
                 href={user.html_url}
                 target="_blank"
+                rel="noopener noreferrer"
                 className="text-blue-600 underline"
               >
                 View Profile
               </a>
+              {user.location && <p>Location: {user.location}</p>}
+              {user.public_repos !== undefined && <p>Repos: {user.public_repos}</p>}
             </div>
           </div>
         ))}
       </div>
-import { searchUsers } from "../services/githubService";
-
-const Search = () => {
-  const [query, setQuery] = useState("");
-  const [results, setResults] = useState([]);
-  const [error, setError] = useState("");
-
-  // Required by the checker: function name MUST be exactly "fetchUserData"
-  const fetchUserData = async () => {
-    try {
-      setError("");
-      setResults([]);
-
-      if (!query) {
-        setError("Please enter a username");
-        return;
-      }
-
-      const data = await searchUsers(query);
-
-      if (data.items.length === 0) {
-        // REQUIRED EXACT TEXT
-        setError("Looks like we cant find the user");
-      } else {
-        setResults(data.items);
-      }
-    } catch (err) {
-      setError("Looks like we cant find the user"); // fallback text for checker
-    }
-  };
-
-  const handleSubmit = (e) => {
-    e.preventDefault();
-    fetchUserData(); // required call
-  };
-
-  return (
-    <div>
-      <h1>GitHub User Search</h1>
-
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Search GitHub users..."
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-        />
-        <button type="submit">Search</button>
-      </form>
-
-      {error && <p>{error}</p>}
-
-      <ul>
-        {results.map((user) => (
-          <li key={user.id}>{user.login}</li>
-        ))}
-      </ul>
     </div>
   );
 };
