@@ -17,16 +17,15 @@ const Search = () => {
     setResults([]);
 
     try {
-      const data = await fetchUserData({ username, location, minRepos });
-      const users = data.items || [];
+      const users = await fetchUserData({ username, location, minRepos });
 
-      if (users.length === 0) {
-        setError("Looks like we cant find the user");
+      if (!users || users.length === 0) {
+        setError("Looks like we can't find the user");
       } else {
         setResults(users);
       }
     } catch (err) {
-      setError("Looks like we cant find the user");
+      setError("Looks like we can't find the user");
     }
 
     setLoading(false);
@@ -36,6 +35,7 @@ const Search = () => {
     <div className="p-4 max-w-xl mx-auto">
       <h2 className="text-xl font-bold mb-3">GitHub User Search</h2>
 
+      {/* Search Form */}
       <form onSubmit={handleSearch} className="space-y-3">
         <input
           type="text"
@@ -66,9 +66,13 @@ const Search = () => {
         </button>
       </form>
 
+      {/* Loading */}
       {loading && <p className="mt-4">Loading...</p>}
+
+      {/* Error */}
       {error && <p className="mt-4 text-red-500">{error}</p>}
 
+      {/* Results */}
       <div className="mt-4 space-y-4">
         {results.map((user) => (
           <div key={user.id} className="p-3 border rounded flex items-center space-x-3">
@@ -82,13 +86,10 @@ const Search = () => {
               <a
                 href={user.html_url}
                 target="_blank"
-                rel="noopener noreferrer"
                 className="text-blue-600 underline"
               >
                 View Profile
               </a>
-              {user.location && <p>Location: {user.location}</p>}
-              {user.public_repos !== undefined && <p>Repos: {user.public_repos}</p>}
             </div>
           </div>
         ))}
