@@ -4,38 +4,52 @@ function AddRecipeForm() {
   const [title, setTitle] = useState("");
   const [ingredients, setIngredients] = useState("");
   const [steps, setSteps] = useState("");
-  const [error, setError] = useState("");
+
+  const [errors, setErrors] = useState({});
+
+  const validate = () => {
+    const newErrors = {};
+
+    if (!title.trim()) {
+      newErrors.title = "Title is required";
+    }
+
+    if (!ingredients.trim()) {
+      newErrors.ingredients = "Ingredients are required";
+    } else {
+      const list = ingredients
+        .split(",")
+        .map((i) => i.trim())
+        .filter(Boolean);
+
+      if (list.length < 2) {
+        newErrors.ingredients = "At least two ingredients required";
+      }
+    }
+
+    if (!steps.trim()) {
+      newErrors.steps = "Preparation steps are required";
+    }
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!title || !ingredients || !steps) {
-      setError("All fields are required");
-      return;
-    }
-
-    const ingredientsList = ingredients
-      .split(",")
-      .map((item) => item.trim())
-      .filter(Boolean);
-
-    if (ingredientsList.length < 2) {
-      setError("Please enter at least two ingredients");
-      return;
-    }
-
-    setError("");
+    if (!validate()) return;
 
     console.log({
       title,
-      ingredients: ingredientsList,
+      ingredients,
       steps,
     });
 
-    // Reset form
     setTitle("");
     setIngredients("");
     setSteps("");
+    setErrors({});
   };
 
   return (
@@ -48,11 +62,7 @@ function AddRecipeForm() {
           Add New Recipe
         </h2>
 
-        {error && (
-          <p className="text-red-500 text-sm mb-4 text-center">{error}</p>
-        )}
-
-        {/* Recipe Title */}
+        {/* Title */}
         <div className="mb-4">
           <label className="block text-gray-700 mb-1">Recipe Title</label>
           <input
@@ -60,8 +70,10 @@ function AddRecipeForm() {
             className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
-            placeholder="Enter recipe title"
           />
+          {errors.title && (
+            <p className="text-red-500 text-sm mt-1">{errors.title}</p>
+          )}
         </div>
 
         {/* Ingredients */}
@@ -70,29 +82,34 @@ function AddRecipeForm() {
             Ingredients (comma separated)
           </label>
           <textarea
-            className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             rows="3"
+            className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={ingredients}
             onChange={(e) => setIngredients(e.target.value)}
-            placeholder="e.g. eggs, flour, sugar"
           />
+          {errors.ingredients && (
+            <p className="text-red-500 text-sm mt-1">
+              {errors.ingredients}
+            </p>
+          )}
         </div>
 
-        {/* Preparation Steps */}
+        {/* Steps */}
         <div className="mb-6">
           <label className="block text-gray-700 mb-1">
             Preparation Steps
           </label>
           <textarea
-            className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             rows="4"
+            className="w-full border rounded px-3 py-2 focus:outline-none focus:ring-2 focus:ring-blue-500"
             value={steps}
             onChange={(e) => setSteps(e.target.value)}
-            placeholder="Enter preparation steps"
           />
+          {errors.steps && (
+            <p className="text-red-500 text-sm mt-1">{errors.steps}</p>
+          )}
         </div>
 
-        {/* Submit Button */}
         <button
           type="submit"
           className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition duration-300"
