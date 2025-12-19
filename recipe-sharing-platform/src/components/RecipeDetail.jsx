@@ -1,43 +1,70 @@
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
+import { useEffect, useState } from "react";
 import recipesData from "../data.json";
 
 function RecipeDetail() {
   const { id } = useParams();
-  const recipe = recipesData.find(
-    (item) => item.id === parseInt(id)
-  );
+  const [recipe, setRecipe] = useState(null);
+
+  useEffect(() => {
+    const selectedRecipe = recipesData.find(
+      (item) => item.id === parseInt(id)
+    );
+    setRecipe(selectedRecipe);
+  }, [id]);
 
   if (!recipe) {
-    return <p className="p-6">Recipe not found.</p>;
+    return (
+      <div className="text-center mt-20 text-gray-500">
+        Recipe not found
+      </div>
+    );
   }
 
   return (
     <div className="max-w-3xl mx-auto p-6">
-      <img
-        src={recipe.image}
-        alt={recipe.title}
-        className="w-full h-64 object-cover rounded-lg mb-6"
-      />
+      <Link
+        to="/"
+        className="text-blue-500 hover:underline mb-4 inline-block"
+      >
+        ← Back to Home
+      </Link>
 
-      <h1 className="text-2xl font-bold mb-4">{recipe.title}</h1>
+      <div className="bg-white rounded-lg shadow-lg p-6">
+        <img
+          src={recipe.image}
+          alt={recipe.title}
+          className="w-full h-64 object-cover rounded-lg mb-6"
+        />
 
-      <section className="mb-6">
-        <h2 className="text-xl font-semibold mb-2">Ingredients</h2>
-        <ul className="list-disc list-inside text-gray-700">
-          {recipe.ingredients.map((ingredient, index) => (
-            <li key={index}>{ingredient}</li>
-          ))}
-        </ul>
-      </section>
+        <h2 className="text-2xl font-bold text-gray-800 mb-4">
+          {recipe.title}
+        </h2>
 
-      <section>
-        <h2 className="text-xl font-semibold mb-2">Instructions</h2>
-        <ol className="list-decimal list-inside text-gray-700 space-y-2">
-          {recipe.instructions.map((step, index) => (
-            <li key={index}>{step}</li>
-          ))}
-        </ol>
-      </section>
+        <p className="text-gray-600 mb-6">
+          {recipe.summary}
+        </p>
+
+        <div className="mt-6">
+          <h3 className="text-xl font-semibold mb-2">
+            Ingredients
+          </h3>
+          <ul className="list-disc list-inside text-gray-600">
+            <li>Ingredient 1</li>
+            <li>Ingredient 2</li>
+            <li>Ingredient 3</li>
+          </ul>
+        </div>
+
+        <div className="mt-6">
+          <h3 className="text-xl font-semibold mb-2">
+            Cooking Instructions
+          </h3>
+          <p className="text-gray-600">
+            Follow the steps carefully to prepare this delicious recipe.
+          </p>
+        </div>
+      </div>
     </div>
   );
 }
