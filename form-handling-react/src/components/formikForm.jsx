@@ -13,18 +13,20 @@ function FormikForm() {
     email: Yup.string()
       .email("Invalid email format")
       .required("Email is required"),
-    password: Yup.string().required("Password is required"),
+    password: Yup.string()
+      .min(6, "Password must be at least 6 characters")
+      .required("Password is required"),
   });
 
   const handleSubmit = (values, { resetForm }) => {
-    console.log("Formik submission:", values);
+    console.log("Formik Form Data:", values);
     alert("Formik registration successful!");
     resetForm();
   };
 
   return (
     <div>
-      <h2>Register (Formik)</h2>
+      <h2>Register (Formik Form)</h2>
 
       <Formik
         initialValues={initialValues}
@@ -33,18 +35,30 @@ function FormikForm() {
       >
         <Form>
           <div>
-            <Field name="username" placeholder="Username" />
-            <ErrorMessage name="username" component="div" />
+            <Field type="text" name="username" placeholder="Username" />
+            <ErrorMessage
+              name="username"
+              component="div"
+              style={{ color: "red" }}
+            />
           </div>
 
           <div>
-            <Field name="email" type="email" placeholder="Email" />
-            <ErrorMessage name="email" component="div" />
+            <Field type="email" name="email" placeholder="Email" />
+            <ErrorMessage
+              name="email"
+              component="div"
+              style={{ color: "red" }}
+            />
           </div>
 
           <div>
-            <Field name="password" type="password" placeholder="Password" />
-            <ErrorMessage name="password" component="div" />
+            <Field type="password" name="password" placeholder="Password" />
+            <ErrorMessage
+              name="password"
+              component="div"
+              style={{ color: "red" }}
+            />
           </div>
 
           <button type="submit">Register</button>

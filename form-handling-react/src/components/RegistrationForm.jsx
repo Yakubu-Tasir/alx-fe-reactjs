@@ -15,18 +15,19 @@ function RegistrationForm() {
     }
 
     setError("");
-    console.log({ username, email, password });
+    console.log("User Registered:", { username, email, password });
     alert("Registration successful!");
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <h2>Register (Controlled Components)</h2>
+      <h2>Register (Controlled Form)</h2>
 
       {error && <p style={{ color: "red" }}>{error}</p>}
 
       <input
         type="text"
+        name="username"
         placeholder="Username"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
@@ -34,6 +35,7 @@ function RegistrationForm() {
 
       <input
         type="email"
+        name="email"
         placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
@@ -41,6 +43,7 @@ function RegistrationForm() {
 
       <input
         type="password"
+        name="password"
         placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
