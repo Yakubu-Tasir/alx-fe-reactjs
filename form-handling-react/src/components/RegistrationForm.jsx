@@ -4,30 +4,39 @@ function RegistrationForm() {
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
+  const [errors, setErrors] = useState("");
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    if (!username || !email || !password) {
-      setError("All fields are required");
+    if (!username) {
+      setErrors("Username is required");
       return;
     }
 
-    setError("");
+    if (!email) {
+      setErrors("Email is required");
+      return;
+    }
+
+    if (!password) {
+      setErrors("Password is required");
+      return;
+    }
+
+    setErrors("");
     console.log("User Registered:", { username, email, password });
     alert("Registration successful!");
   };
 
   return (
     <form onSubmit={handleSubmit}>
-      <h2>Register (Controlled Form)</h2>
+      <h2>Register</h2>
 
-      {error && <p style={{ color: "red" }}>{error}</p>}
+      {errors && <p style={{ color: "red" }}>{errors}</p>}
 
       <input
         type="text"
-        name="username"
         placeholder="Username"
         value={username}
         onChange={(e) => setUsername(e.target.value)}
@@ -35,7 +44,6 @@ function RegistrationForm() {
 
       <input
         type="email"
-        name="email"
         placeholder="Email"
         value={email}
         onChange={(e) => setEmail(e.target.value)}
@@ -43,7 +51,6 @@ function RegistrationForm() {
 
       <input
         type="password"
-        name="password"
         placeholder="Password"
         value={password}
         onChange={(e) => setPassword(e.target.value)}
