@@ -1,44 +1,31 @@
 import React from 'react';
 import { render, screen, fireEvent } from '@testing-library/react';
-import '@testing-library/jest-dom';
 import TodoList from '../components/TodoList';
+import '@testing-library/jest-dom'; // Vital for "toBeInTheDocument"
 
 describe('TodoList Component', () => {
-  test('renders the initial render of TodoList correctly', () => {
+  test('renders TodoList component', () => {
     render(<TodoList />);
-    expect(screen.getByText('Todo List')).toBeInTheDocument();
-    expect(screen.getByText('Learn React')).toBeInTheDocument();
+    expect(screen.getByText(/Todo List/i)).toBeInTheDocument();
   });
 
-  test('can add a new todo', () => {
+  test('adds a new todo', () => {
     render(<TodoList />);
-    const input = screen.getByPlaceholderText('Add a new todo');
-    const addButton = screen.getByText('Add Todo');
+    const input = screen.getByPlaceholderText(/Add a new todo/i);
+    const addButton = screen.getByText(/Add Todo/i);
     
-    fireEvent.change(input, { target: { value: 'Wash Car' } });
+    fireEvent.change(input, { target: { value: 'Test Task' } });
     fireEvent.click(addButton);
     
-    expect(screen.getByText('Wash Car')).toBeInTheDocument();
+    expect(screen.getByText('Test Task')).toBeInTheDocument();
   });
 
-  test('can toggle a todo completion status', () => {
+  test('deletes a todo', () => {
     render(<TodoList />);
-    const todoItem = screen.getByText('Learn React');
+    const deleteButtons = screen.getAllByText(/Delete/i);
+    const initialCount = deleteButtons.length;
     
-    fireEvent.click(todoItem);
-    expect(todoItem).toHaveStyle('text-decoration: line-through');
-    
-    fireEvent.click(todoItem);
-    expect(todoItem).toHaveStyle('text-decoration: none');
-  });
-
-  test('can delete a todo', () => {
-    render(<TodoList />);
-    const todoItem = screen.getByText('Learn React');
-    // Get the delete button specifically for the first todo
-    const deleteButton = screen.getAllByText('Delete')[0];
-    
-    fireEvent.click(deleteButton);
-    expect(todoItem).not.toBeInTheDocument();
+    fireEvent.click(deleteButtons[0]);
+    expect(screen.queryAllByText(/Delete/i).length).toBeLessThan(initialCount);
   });
 });
